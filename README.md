@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
 ```
 
 The *SceneRoot* object at the root of the newly loaded scene hierarchy can access the injected object through the *SceneRoot.Payload* property.
-```
+```cs
 public class PuzzleScene : SceneRoot
 {
     public bool Finished { get; private set; } = false;
