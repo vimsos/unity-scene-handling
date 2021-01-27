@@ -1,6 +1,6 @@
 {
     "name": "com.github.vvwvin.unity-scene-handling",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "displayName": "Scene Handling Utility",
     "description": "A static utility providing asynchronous, additive by default, scene loading for Unity3D",
     "unity": "2019.4",
