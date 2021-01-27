@@ -17,6 +17,7 @@ namespace VV.SceneHandling
         static void Initialize()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
 
         static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -68,6 +69,12 @@ namespace VV.SceneHandling
             SceneManager.SetActiveScene(scene);
         }
 
+        static void OnSceneUnloaded(Scene scene)
+        {
+            var handle = current.FirstOrDefault((h) => h.SceneName == scene.name && h.Id == scene.handle);
+            current.Remove(handle);
+        }
+
         public static SceneLoadHandle Load(string sceneName, object payload = null)
         {
             var operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
@@ -88,8 +95,6 @@ namespace VV.SceneHandling
             }
 
             var unloadHandle = new SceneUnloadHandle(loadedHandle.Scene, operation);
-            operation.completed += (op) => { current.Remove(loadedHandle); };
-
             return unloadHandle;
         }
     }
