@@ -11,6 +11,7 @@ namespace VV.SceneHandling
 
         static Dictionary<SceneLoadHandle, object> cargo = new Dictionary<SceneLoadHandle, object>();
         static List<SceneLoadHandle> current = new List<SceneLoadHandle>();
+        static bool firstSceneIsLoaded = false;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Initialize()
@@ -27,7 +28,15 @@ namespace VV.SceneHandling
                 {
                     handle = new SceneLoadHandle(scene.name, mode, null);
                     handle.Scene = scene;
-                    Debug.LogWarning($"[SceneHandler] a scene named {scene.name} loaded with {(mode == LoadSceneMode.Additive ? "LoadSceneMode.Additive" : "LoadSceneMode.Single")} was not found inside the dictionary");
+
+                    if (!firstSceneIsLoaded)
+                    {
+                        firstSceneIsLoaded = true;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[SceneHandler] a scene named {scene.name} loaded with LoadSceneMode.{(mode == LoadSceneMode.Additive ? "Additive" : "Single")} was not found inside the dictionary");
+                    }
                 }
 
                 // retrieve the payload
