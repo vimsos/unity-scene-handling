@@ -16,54 +16,56 @@ namespace VV.SceneHandling
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Initialize()
         {
-            SceneManager.sceneLoaded += (scene, mode) =>
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            object payload = null;
+
+            // match the scene being loaded to a previously created handle
+            var handle = cargo.Keys.FirstOrDefault((h) => h.SceneName == scene.name && h.Mode == mode);
+
+            // if the handle is null the scene was not loaded using this handler, possibly it is the first scene being loaded
+            if (handle == null)
             {
-                object payload = null;
-
-                // match the scene being loaded to a previously created handle
-                var handle = cargo.Keys.FirstOrDefault((h) => h.SceneName == scene.name && h.Mode == mode);
-
-                // if the handle is null the scene was not loaded using this handler, possibly it is the first scene being loaded
-                if (handle == null)
-                {
-                    handle = new SceneLoadHandle(scene.name, mode, null);
-                    handle.Scene = scene;
-
-                    if (!firstSceneIsLoaded)
-                    {
-                        firstSceneIsLoaded = true;
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[SceneHandler] a scene named {scene.name} loaded with LoadSceneMode.{(mode == LoadSceneMode.Additive ? "Additive" : "Single")} was not found inside the dictionary");
-                    }
-                }
-
-                // retrieve the payload
-                cargo.TryGetValue(handle, out payload);
-                cargo.Remove(handle);
-
-                // add scene to the stack 
+                handle = new SceneLoadHandle(scene.name, mode, null);
                 handle.Scene = scene;
-                current.Add(handle);
 
-                // insert payload into the scene's root object
-                foreach (GameObject go in scene.GetRootGameObjects())
+                if (!firstSceneIsLoaded)
                 {
-                    var root = go.GetComponent<SceneRoot>();
-
-                    if (root != null)
-                    {
-                        handle.Root = root;
-                        root.Handle = handle;
-                        root.Payload = payload;
-                        root.Activate();
-                        break;
-                    }
+                    firstSceneIsLoaded = true;
                 }
+                else
+                {
+                    Debug.LogWarning($"[SceneHandler] a scene named {scene.name} loaded with LoadSceneMode.{(mode == LoadSceneMode.Additive ? "Additive" : "Single")} was not found inside the dictionary");
+                }
+            }
 
-                SceneManager.SetActiveScene(scene);
-            };
+            // retrieve the payload
+            cargo.TryGetValue(handle, out payload);
+            cargo.Remove(handle);
+
+            // add scene to the list
+            handle.Scene = scene;
+            current.Add(handle);
+
+            // insert payload into the scene's root object
+            foreach (GameObject go in scene.GetRootGameObjects())
+            {
+                var root = go.GetComponent<SceneRoot>();
+
+                if (root != null)
+                {
+                    handle.Root = root;
+                    root.Handle = handle;
+                    root.Payload = payload;
+                    root.Activate();
+                    break;
+                }
+            }
+
+            SceneManager.SetActiveScene(scene);
         }
 
         public static SceneLoadHandle Load(string sceneName, object payload = null)
