@@ -61,7 +61,6 @@ namespace VV.SceneHandling
                     handle.Root = root;
                     root.Handle = handle;
                     root.Payload = payload;
-                    root.Activate();
                     break;
                 }
             }
