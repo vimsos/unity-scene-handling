@@ -74,10 +74,10 @@ namespace VV.SceneHandling
             current.Remove(handle);
         }
 
-        public static SceneLoadHandle Load(string sceneName, object payload = null)
+        public static SceneLoadHandle Load(string sceneName, object payload = null, LoadSceneMode mode = LoadSceneMode.Additive)
         {
-            var operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-            var handle = new SceneLoadHandle(sceneName, LoadSceneMode.Additive, operation);
+            var operation = SceneManager.LoadSceneAsync(sceneName, mode);
+            var handle = new SceneLoadHandle(sceneName, mode, operation);
             cargo.Add(handle, payload);
 
             return handle;
